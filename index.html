@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>A Basic Map</title>
+	<style>
+		#map {
+			height: 100%;
+		}
+		/* Optional: Makes the sample page fill the window. */
+		html, body {
+			height: 100%;
+			margin: 0;
+			padding: 0;
+		}
+	</style>
+	<script>
+	function initMap() {
+		var mapOptions = {
+			zoom: 8,
+			center: new google.maps.LatLng(44, -110),
+			mapTypeId: 'satellite'
+		};
+	var map = new google.maps.Map(document.getElementById('map'), mapOptions);
+    // setMarkers(map);
+}
+</script>
+</head>
+<body>
+<div id="osos">
+div to show
+</div>
+
+<div id="map"></div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<script async defer
+		src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBzNSnQwIXwcg2alnWcI0kXRowpQMkHkrI&callback=initMap&v=weekly">
+</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.13.5/xlsx.full.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.13.5/jszip.js"></script>
+<script>
+  var WhiteListRender = [];
+
+     var url="https://docs.google.com/spreadsheets/u/0/d/1N1Ss9AS73rnr0fH52rIUk4vWEsiG_2P5/gviz/tq?tqx=out:html&tq&gid=1"
+       /* set up async GET request */
+       var req = new XMLHttpRequest();
+    req.open("GET", url, true);
+    req.responseType = "arraybuffer";
+    var out={"os":[]}
+   
+    req.onload = function(e) {
+
+        var x=[];
+        var res=[];
+      var data = new Uint8Array(req.response);
+      var workbook = XLSX.read(data, {type:"array"});
+      out=e.target.result;
+      var firstSheet = workbook.SheetNames[0];
+      
+      var excelRows = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[firstSheet]);
+      out=excelRows
+      var hospitaltype="provider_name"
+      var hospitaltype1="city"
+      var hospitaltype2="gouvernate"
+      var hospitaltype3="online_status"
+      var hospitaltype4="Provider_Specialty"
+       
+       
+      var statment=` <label for=${hospitaltype}>${hospitaltype} </label><select name="cars" id="${hospitaltype}" ></select>`;
+      var statment1=` <label for=${hospitaltype1}>${hospitaltype1} </label><select name="cars" id="${hospitaltype1}" ></select>`;
+      var statment2=` <label for=${hospitaltype2}>${hospitaltype2} </label><select name="cars" id="${hospitaltype2}" ></select>`;
+      var statment3=` <label for=${hospitaltype3}>${hospitaltype3} </label><select name="cars" id="${hospitaltype3}" ></select>`;
+      var statment4=` <label for=${hospitaltype4}>${hospitaltype4} </label><select name="cars" id="${hospitaltype4}" ></select>`;
+  
+      var button=`<button onclick="draw_filter();">filter</button>`
+        WhiteListRender.push(statment);
+        WhiteListRender.push(statment1);
+        WhiteListRender.push(statment2);
+        WhiteListRender.push(statment3);
+        WhiteListRender.push(statment4);
+        WhiteListRender.push(button);
+        $("#osos").html(WhiteListRender)
+   
+        draw();
+
+          }
+      req.send();
+      
+      
+ function draw_filter(){
+ 
+      var x=[];
+      var res=[];
+      
+      var val= $('#provider_name').val();
+      var val1= $('#city').val();
+      var val2= $('#gouvernate').val();
+      var val3= $("#online_status").val();
+      var val4= $('#Provider_Specialty').val();
+      
+      var item="";
+       var city="";
+       var gouvernate="";
+       var online_status="";
+       var Provider_Specialty="";
+    for (i=1;i<out.length;i++)
+      {
+         if(val=="all"){
+        item="all"
+      }
+      else{
+           item=out[i].provider_name;
+      }
+      if(val1=="all"){
+        city="all"
+      }
+      else{
+           city=out[i].city;
+      }
+       if(val2=="all"){
+        gouvernate="all"
+      }
+        else{
+          gouvernate=out[i].governate;
+      }
+          if(val3=="all"){
+        online_status="all"
+      }
+        else{
+          online_status=out[i]["Online Status"];
+      }
+        if(val4=="all"){
+        Provider_Specialty="all"
+      }
+        else{
+          Provider_Specialty=out[i]["Provider Specialty"];
+      }
+      
+      
+       console.log(Provider_Specialty)
+       console.log(val4)
+        
+      if (item==val && city==val1 && gouvernate==val2 && Provider_Specialty==val4 && online_status==val3){
+        console.log("ana hnaa")
+        x=[parseFloat(out[i].lat_oct_x),parseFloat(out[i].long_oct_y),out[i].provider_name];
+        console.log(out[i].provider_name)
+        res.push(x);
+      }
+    }
+
+
+    var mapOptions = {
+			zoom: 12,
+			center: new google.maps.LatLng(res[0][0], res[0][1]),
+			mapTypeId: 'satellite'
+            
+		};
+    
+        var map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+        setMarkers(map,res)
+     
+     }
+ 
+ function draw(){
+  
+      var x=[];
+        var res=[];
+  var id="provider_name"
+  var id1="city"
+  var id2="gouvernate"
+  var id3="online_status"
+  var id4="Provider_Specialty"
+  select=document.getElementById(id);
+    select1=document.getElementById(id1);
+    select2=document.getElementById(id2);
+    select3=document.getElementById(id3);
+    select4=document.getElementById(id4);
+    let option = document.createElement("option");
+    let option1 = document.createElement("option");
+    let option2 = document.createElement("option");
+    let option3 = document.createElement("option");
+    let option4 = document.createElement("option");
+        option.value = "all";
+        option1.value = "all";
+        option2.value = "all";
+        option3.value = "all";
+        option4.value = "all";
+       option.innerText = "all";
+        option1.innerText = "all";
+        option2.innerText = "all";
+        option3.innerText = "all";
+        option4.innerText = "all";
+        select.appendChild(option);
+        select1.appendChild(option1);
+        select2.appendChild(option2);
+        select3.appendChild(option3);
+        select4.appendChild(option4);
+
+    for (i=1;i<out.length;i++)
+      { var item=out[i].provider_name;
+       var city=out[i].city;
+       var gouvernate=out[i].governate;
+       var online_status=out[i]["Online Status"];
+       var Provider_Specialty=out[i]["Provider Specialty"];
+
+        let option = document.createElement("option");
+        let option1 = document.createElement("option");
+        let option2 = document.createElement("option");
+        let option3 = document.createElement("option");
+        let option4 = document.createElement("option");
+        option.value = item;
+        option1.value = city;
+        option2.value = gouvernate;
+        option3.value = online_status;
+        option4.value = Provider_Specialty;
+       option.innerText = item;
+        option1.innerText = city;
+        option2.innerText = gouvernate;
+        option3.innerText = online_status;
+        option4.innerText = Provider_Specialty;
+        select.appendChild(option);
+        select1.appendChild(option1);
+        select2.appendChild(option2);
+        select3.appendChild(option3);
+        select4.appendChild(option4);
+        x=[parseFloat(out[i].lat_oct_x),parseFloat(out[i].long_oct_y),out[i].provider_name];
+   
+        res.push(x);
+    }
+
+
+    var mapOptions = {
+			zoom: 12,
+			center: new google.maps.LatLng(res[0][0], res[0][1]),
+			mapTypeId: 'satellite'
+            
+		};
+    
+        var map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+        setMarkers(map,res)
+     
+     }
+      /* DO SOMETHING WITH workbook HERE */
+  
+
+    
+    
+
+  
+  function setMarkers(map,beaches) {
+    // Adds markers to the map.
+    // Marker sizes are expressed as a Size of X,Y where the origin of the image
+    // (0,0) is located in the top left of the image.
+    // Origins, anchor positions and coordinates of the marker increase in the X
+    // direction to the right and in the Y direction down.
+    const image = {
+      url: "th.jfif",
+      // This marker is 20 pixels wide by 32 pixels high.
+      size: new google.maps.Size(20, 32),
+      // The origin for this image is (0, 0).
+      origin: new google.maps.Point(0, 0),
+      // The anchor for this image is the base of the flagpole at (0, 32).
+      anchor: new google.maps.Point(0, 32),
+    };
+    // Shapes define the clickable region of the icon. The type defines an HTML
+    // <area> element 'poly' which traces out a polygon as a series of X,Y points.
+    // The final coordinate closes the poly by connecting to the first coordinate.
+    const shape = {
+      coords: [1, 1, 1, 20, 18, 20, 18, 1],
+      type: "poly",
+    };
+  
+    for (let i = 0; i < beaches.length; i++) {
+      const beach = beaches[i];
+      
+  
+      new google.maps.Marker({
+        position: { lat: beach[0], lng: beach[1] },
+        map,
+        // icon:image,
+        shape: shape,
+        title:beach[2]
+
+      });
+    }
+    marker.addListener("click", () => {
+      infoWindow.close();
+      infoWindow.setContent(marker.getTitle());
+      infoWindow.open(marker.getMap(), marker);
+    });
+  }
+</script>
+<script>
+    window.initMap = initMap;
+</script>
+
+</body>
+</html>
